@@ -13,7 +13,7 @@ protocol for more information.
 * **Inbound Connections:** Multiple.
 * **Outbound Connections:** Multiple.
 * **Pipelining:** No.
-* **Behavior:** Gateway.
+* **Behavior:** Filter.
 
 ## Notes
 * Does not correctly reply to Pipelining & Protocol Version requests.

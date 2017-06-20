@@ -9,7 +9,7 @@
 
 static volatile char JH_SERVER_IS_RUNNING = (char) 1;
 
-static void request_termination (int const signo)
+static void request_termination (const int signo)
 {
    if ((signo == SIGINT) || (signo == SIGTERM))
    {

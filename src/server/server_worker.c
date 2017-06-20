@@ -47,8 +47,12 @@ void * JH_server_worker_main (void * input)
 {
    struct JH_limiter_filter filter;
    struct JH_server_worker worker;
+   int retries;
+   int state;
 
    initialize(&worker, input);
+
+   retries = 0;
 
    if (JH_limiter_filter_initialize(&filter, worker.params.socket) < 0)
    {
@@ -59,9 +63,45 @@ void * JH_server_worker_main (void * input)
 
    while (JH_server_is_running())
    {
-      if (JH_limiter_filter_step(&filter, worker.params.server_params) < 0)
+      state = JH_limiter_filter_step(&filter, worker.params.server_params);
+
+      switch (state)
       {
-         break;
+         case 0:
+            retries = 0;
+            break;
+
+         case 1:
+            retries += 1;
+
+            if (retries == JH_SERVER_WORKER_MAX_RETRIES)
+            {
+               JH_S_ERROR
+               (
+                  stderr,
+                  "Thread's upstream socket timed out too many consequent"
+                  " times."
+               );
+
+               JH_limiter_filter_finalize(&filter);
+
+               finalize(&worker);
+
+               return NULL;
+
+            }
+            else
+            {
+               sleep(JH_SERVER_WORKER_RETRY_DELAY_SEC);
+            }
+            break;
+
+         default:
+            JH_limiter_filter_finalize(&filter);
+
+            finalize(&worker);
+
+            return NULL;
       }
    }
 

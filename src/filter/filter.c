@@ -121,6 +121,10 @@ static int listen_to_upstream
 
          return -1;
       }
+      else if (io_bytes == 0)
+      {
+         return 1;
+      }
 
       errno = old_errno;
 
@@ -226,6 +230,10 @@ static int send_downstream
 
          return -1;
       }
+      else if (io_bytes == 0)
+      {
+         return 1;
+      }
 
       errno = 0;
 
@@ -295,6 +303,10 @@ static int send_upstream
          errno = old_errno;
 
          return -1;
+      }
+      else if (io_bytes == 0)
+      {
+         return 1;
       }
 
       errno = 0;
